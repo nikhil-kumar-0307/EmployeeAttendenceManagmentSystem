@@ -13,5 +13,6 @@ namespace EmployeeAttendenceManagmentSystem.Models
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<ReportingLine> ReportingLines { get; set; }
     }
 }

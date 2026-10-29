@@ -10,9 +10,9 @@
             AutomaticMigrationsEnabled = false;
         }
 
-        // Runs after every migration - AddOrUpdate keeps it free of duplicates
         protected override void Seed(AttendanceDbContext context)
         {
+            // Admin login
             context.Users.AddOrUpdate(u => u.EmployeeCode,
                 new User
                 {
@@ -22,16 +22,16 @@
                     Role = UserRoles.Admin,
                     Password = "Admin@123",
                     IsActive = true
-                },
-                new User
-                {
-                    EmployeeCode = "EMP1001",
-                    FullName = "Test Employee",
-                    Department = "Operations",
-                    Role = UserRoles.Employee,
-                    Password = "Emp@123",
-                    IsActive = true
                 });
+
+            // DUMMY reporting lines: 5866 is the manager of 9001..9005
+            // (these match the dummy data in Database/AttendanceLogDb_Setup.sql)
+            context.ReportingLines.AddOrUpdate(r => new { r.ManagerEmployeeNo, r.EmployeeNo },
+                new ReportingLine { ManagerEmployeeNo = "5866", EmployeeNo = "9001" },
+                new ReportingLine { ManagerEmployeeNo = "5866", EmployeeNo = "9002" },
+                new ReportingLine { ManagerEmployeeNo = "5866", EmployeeNo = "9003" },
+                new ReportingLine { ManagerEmployeeNo = "5866", EmployeeNo = "9004" },
+                new ReportingLine { ManagerEmployeeNo = "5866", EmployeeNo = "9005" });
         }
     }
 }

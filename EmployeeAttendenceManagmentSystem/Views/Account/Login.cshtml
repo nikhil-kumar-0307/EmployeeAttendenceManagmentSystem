@@ -13,18 +13,14 @@
 </head>
 <body>
 
-    <!-- ============ HEADER (same look as Sangam header) ============ -->
+    <!-- ===== Header ===== -->
     <header class="site-header">
-        <div class="header-top">
+        <div class="header-inner">
             <div class="brand">
                 <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="brand-logo" />
                 <div class="brand-text">
                     <div class="brand-name">संगम <span>|</span> SANGAM</div>
                     <div class="brand-tag">Powering Unification Of Processes</div>
-                    <div class="dir-search">
-                        <input type="text" placeholder="Directory Search" aria-label="Directory search" />
-                        <button type="button" aria-label="Search">&#128269;</button>
-                    </div>
                 </div>
             </div>
 
@@ -34,97 +30,144 @@
             </div>
 
             <div class="header-right">
-                <div class="header-right-top">
-                    <span class="dots"><i class="d d-blue"></i><i class="d d-green"></i><i class="d d-orange"></i><i class="d d-red"></i></span>
-                    <span class="lang"><span>हिंदी</span><b>EN</b></span>
-                    <div class="welcome">
-                        <strong>Welcome, User</strong>
-                        <small>@DateTime.Now.ToString("dddd, dd MMM yyyy")</small>
-                    </div>
-                    <a href="@Url.Action("Login", "Account")" class="btn-login-top">LOGIN</a>
-                </div>
-                <div class="global-search">
-                    <input type="text" placeholder="Global Search Docs, Circulars, Notices..." aria-label="Global search" />
-                    <button type="button" aria-label="Search">&#128269;</button>
-                </div>
-                
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="brand-logo" />
             </div>
-        </div>        
+        </div>
     </header>
 
-    <!-- ============ LOGIN CARD (same look as Sangam Portal login) ============ -->
+    <!-- ===== Login ===== -->
     <main class="login-wrap">
         <section class="login-card">
 
+            <!-- Left: product panel -->
             <aside class="login-side">
-                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="side-logo" />
-                <h2>Attendance Portal</h2>
-                <p>Unified access to attendance records and administrative tools.</p>
-                <small>&copy; @DateTime.Now.Year Corporate Security</small>
+                <div class="side-top">
+                    <h2>Employee Attendance<br />Management System</h2>
+                    <p class="side-lead">One place to record, review and approve attendance for the station.</p>
+                </div>
+
+                <ul class="features">
+                    <li>
+                        <span class="f-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M9 16l2 2 4-4" /></svg></span>
+                        <div><strong>Daily attendance</strong><span>Check your records and shift details</span></div>
+                    </li>
+                    <li>
+                        <span class="f-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></span>
+                        <div><strong>Leave and overtime</strong><span>Apply, track and approve in one flow</span></div>
+                    </li>
+                    <li>
+                        <span class="f-ico"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></span>
+                        <div><strong>Reports for admins</strong><span>Department and monthly summaries</span></div>
+                    </li>
+                </ul>
+
+                <small class="side-foot">&copy; @DateTime.Now.Year NTPC Kahalgaon. All rights reserved.</small>
             </aside>
 
+            <!-- Right: form -->
             <div class="login-form-area">
-                <h3>Welcome Back</h3>
-                <p class="sub">Please sign in to access your dashboard</p>
+                <h3>Sign in</h3>
+                <p class="sub">Use your employee credentials to continue.</p>
 
-                @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", autocomplete = "off" }))
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", autocomplete = "off", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m => m.ReturnUrl)
                     @Html.HiddenFor(m => m.LoginAs, new { id = "LoginAs" })
 
-                    <!-- Employee / Admin toggle -->
-                    <div class="role-toggle" role="tablist">
-                        <button type="button" class="role-btn @(isAdmin ? "" : "active")" data-role="Employee">Employee</button>
-                        <button type="button" class="role-btn @(isAdmin ? "active" : "")" data-role="Admin">Admin</button>
+                    <div class="role-toggle" role="group" aria-label="Sign in as">
+                        <button type="button" class="role-btn @(isAdmin ? "" : "active")" data-role="Employee" aria-pressed="@(isAdmin ? "false" : "true")">Employee</button>
+                        <button type="button" class="role-btn @(isAdmin ? "active" : "")" data-role="Admin" aria-pressed="@(isAdmin ? "true" : "false")">Admin</button>
                     </div>
 
-                    @Html.ValidationSummary(true, null, new { @class = "alert-error" })
+                    if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+                    {
+                        <div class="alert-error" role="alert">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                            <span>@Html.ValidationSummary(true)</span>
+                        </div>
+                    }
 
-                    <label for="EmployeeCode" class="field-label">USERNAME / EMP. CODE</label>
+                    <label for="EmployeeCode" class="field-label" id="lblCode">Employee No</label>
                     <div class="input-box">
-                        <span class="ico">&#128100;</span>
-                        @Html.TextBoxFor(m => m.EmployeeCode, new { placeholder = "Employee ID", autofocus = "autofocus" })
+                        <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        @Html.TextBoxFor(m => m.EmployeeCode, new { placeholder = "Enter your employee number", autofocus = "autofocus", autocomplete = "username" })
                     </div>
                     @Html.ValidationMessageFor(m => m.EmployeeCode, "", new { @class = "field-error" })
 
-                    <label for="Password" class="field-label">PASSWORD</label>
+                    <label for="Password" class="field-label" id="lblPwd">Date of birth</label>
                     <div class="input-box">
-                        <span class="ico">&#128274;</span>
-                        @Html.PasswordFor(m => m.Password, new { placeholder = "AD Password" })
-                        <button type="button" class="eye" id="togglePwd" aria-label="Show password">&#128065;</button>
+                        <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                        @Html.PasswordFor(m => m.Password, new { placeholder = "DD/MM/YYYY", autocomplete = "current-password" })
+                        <button type="button" class="eye" id="togglePwd" aria-label="Show password">
+                            <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            <svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                        </button>
                     </div>
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "field-error" })
+                    <p class="field-hint" id="pwdHint"></p>
 
                     <label class="remember">
-                        @Html.CheckBoxFor(m => m.RememberMe) Keep me signed in
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        <span>Keep me signed in on this computer</span>
                     </label>
 
-                    <button type="submit" class="btn-signin">SIGN IN &rarr;</button>
-                    <p class="auth-note">&#9432; Authorized Users Only</p>
+                    <button type="submit" class="btn-signin" id="btnSignin">
+                        <span class="btn-label">Sign in</span>
+                    </button>
+
+                    <p class="auth-note">Authorized users only</p>
                 }
             </div>
         </section>
     </main>
 
     <script>
-    (function () {
-        // role toggle
-        var buttons = document.querySelectorAll('.role-btn');
-        var hidden = document.getElementById('LoginAs');
-        buttons.forEach(function (b) {
-            b.addEventListener('click', function () {
-                buttons.forEach(function (x) { x.classList.remove('active'); });
-                b.classList.add('active');
-                hidden.value = b.getAttribute('data-role');
+        (function () {
+            // Employee / Admin toggle
+            var buttons = document.querySelectorAll('.role-btn');
+            var hidden = document.getElementById('LoginAs');
+            var form = document.getElementById('loginForm');
+
+            function applyRole(role) {
+                var emp = role !== 'Admin';
+                document.getElementById('lblCode').textContent = emp ? 'Employee No' : 'Admin ID';
+                document.getElementById('lblPwd').textContent = emp ? 'Date of birth' : 'Password';
+                form.EmployeeCode.placeholder = emp ? 'Enter your employee number' : 'Enter your admin ID';
+                form.Password.placeholder = emp ? 'DD/MM/YYYY' : 'Enter your password';
+                document.getElementById('pwdHint').textContent = emp ? 'Your date of birth is your password, for example 15/01/1985.' : '';
+            }
+
+            buttons.forEach(function (b) {
+                b.addEventListener('click', function () {
+                    buttons.forEach(function (x) { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
+                    b.classList.add('active');
+                    b.setAttribute('aria-pressed', 'true');
+                    hidden.value = b.getAttribute('data-role');
+                    applyRole(hidden.value);
+                });
             });
-        });
-        // show / hide password
-        var pwd = document.getElementById('Password');
-        document.getElementById('togglePwd').addEventListener('click', function () {
-            pwd.type = pwd.type === 'password' ? 'text' : 'password';
-        });
-    })();
+            applyRole(hidden.value);
+
+            // Show / hide password
+            var pwd = document.getElementById('Password');
+            var eye = document.getElementById('togglePwd');
+            eye.addEventListener('click', function () {
+                var show = pwd.type === 'password';
+                pwd.type = show ? 'text' : 'password';
+                eye.classList.toggle('showing', show);
+                eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            });
+
+            // Prevent double submit
+            var btn = document.getElementById('btnSignin');
+            form.addEventListener('submit', function () {
+                if (!form.EmployeeCode.value.trim() || !form.Password.value) return;
+                btn.disabled = true;
+                btn.classList.add('loading');
+                btn.querySelector('.btn-label').textContent = 'Signing in...';
+            });
+        })();
     </script>
 </body>
 </html>

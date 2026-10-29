@@ -1,0 +1,66 @@
+﻿@model EmployeeAttendenceManagmentSystem.Models.ViewModels.SubordinateDayVm
+@{
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+    ViewBag.Title = "Subordinate attendance";
+}
+
+<section class="page-head">
+    <div>
+        <a class="back-link" href="@Url.Action("Index", "EmployeeDashboard")">&larr; Back to home</a>
+        <h2>Subordinate attendance</h2>
+        <p class="person">@Model.Date.ToString("dddd, dd MMMM yyyy")</p>
+    </div>
+
+    <form method="get" class="toolbar">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+        <button type="submit" class="btn-primary">Show</button>
+    </form>
+</section>
+
+<section class="tiles">
+    <div class="tile t-total"><span class="num">@Model.Total</span><span class="lbl">Total</span></div>
+    <div class="tile t-present"><span class="num">@Model.Present</span><span class="lbl">Present</span></div>
+    <div class="tile t-absent"><span class="num">@Model.Absent</span><span class="lbl">Absent</span></div>
+    <div class="tile t-off"><span class="num">@Model.WeeklyOff</span><span class="lbl">Weekly off</span></div>
+    <div class="tile t-leave"><span class="num">@Model.NotMarked</span><span class="lbl">Not marked yet</span></div>
+</section>
+
+<section class="panel">
+    @if (Model.Rows.Count == 0)
+    {
+        <div class="empty">No employees are assigned to you yet.</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Emp. No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Status</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        <tr>
+                            <td>@r.EmployeeNo</td>
+                            <td>@r.Name</td>
+                            <td>@r.Designation</td>
+                            <td><span class="badge b-@r.StatusClass">@r.Status</span></td>
+                            <td>@r.InText</td>
+                            <td>@r.OutText</td>
+                            <td><a class="row-link" href="@Url.Action("SubordinateMonthly", "EmployeeDashboard", new { employeeNo = r.EmployeeNo, month = Model.Date.ToString("yyyy-MM") })">Monthly view</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
