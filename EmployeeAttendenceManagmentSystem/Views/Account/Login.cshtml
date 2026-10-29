@@ -1,0 +1,130 @@
+﻿@model EmployeeAttendenceManagmentSystem.Models.DTOs.LoginDto
+@{
+    Layout = null;
+    var isAdmin = Model.LoginAs == "Admin";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in | Employee Attendance Management System</title>
+    <link href="~/Content/login.css" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- ============ HEADER (same look as Sangam header) ============ -->
+    <header class="site-header">
+        <div class="header-top">
+            <div class="brand">
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="brand-logo" />
+                <div class="brand-text">
+                    <div class="brand-name">संगम <span>|</span> SANGAM</div>
+                    <div class="brand-tag">Powering Unification Of Processes</div>
+                    <div class="dir-search">
+                        <input type="text" placeholder="Directory Search" aria-label="Directory search" />
+                        <button type="button" aria-label="Search">&#128269;</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plant-title">
+                <h1>KAHALGAON SUPER THERMAL POWER STATION</h1>
+                <p>2340 MW (STAGE-1: 4X210, STAGE-2: 3X500)</p>
+            </div>
+
+            <div class="header-right">
+                <div class="header-right-top">
+                    <span class="dots"><i class="d d-blue"></i><i class="d d-green"></i><i class="d d-orange"></i><i class="d d-red"></i></span>
+                    <span class="lang"><span>हिंदी</span><b>EN</b></span>
+                    <div class="welcome">
+                        <strong>Welcome, User</strong>
+                        <small>@DateTime.Now.ToString("dddd, dd MMM yyyy")</small>
+                    </div>
+                    <a href="@Url.Action("Login", "Account")" class="btn-login-top">LOGIN</a>
+                </div>
+                <div class="global-search">
+                    <input type="text" placeholder="Global Search Docs, Circulars, Notices..." aria-label="Global search" />
+                    <button type="button" aria-label="Search">&#128269;</button>
+                </div>
+                
+            </div>
+        </div>        
+    </header>
+
+    <!-- ============ LOGIN CARD (same look as Sangam Portal login) ============ -->
+    <main class="login-wrap">
+        <section class="login-card">
+
+            <aside class="login-side">
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="side-logo" />
+                <h2>Attendance Portal</h2>
+                <p>Unified access to attendance records and administrative tools.</p>
+                <small>&copy; @DateTime.Now.Year Corporate Security</small>
+            </aside>
+
+            <div class="login-form-area">
+                <h3>Welcome Back</h3>
+                <p class="sub">Please sign in to access your dashboard</p>
+
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", autocomplete = "off" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ReturnUrl)
+                    @Html.HiddenFor(m => m.LoginAs, new { id = "LoginAs" })
+
+                    <!-- Employee / Admin toggle -->
+                    <div class="role-toggle" role="tablist">
+                        <button type="button" class="role-btn @(isAdmin ? "" : "active")" data-role="Employee">Employee</button>
+                        <button type="button" class="role-btn @(isAdmin ? "active" : "")" data-role="Admin">Admin</button>
+                    </div>
+
+                    @Html.ValidationSummary(true, null, new { @class = "alert-error" })
+
+                    <label for="EmployeeCode" class="field-label">USERNAME / EMP. CODE</label>
+                    <div class="input-box">
+                        <span class="ico">&#128100;</span>
+                        @Html.TextBoxFor(m => m.EmployeeCode, new { placeholder = "Employee ID", autofocus = "autofocus" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.EmployeeCode, "", new { @class = "field-error" })
+
+                    <label for="Password" class="field-label">PASSWORD</label>
+                    <div class="input-box">
+                        <span class="ico">&#128274;</span>
+                        @Html.PasswordFor(m => m.Password, new { placeholder = "AD Password" })
+                        <button type="button" class="eye" id="togglePwd" aria-label="Show password">&#128065;</button>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "field-error" })
+
+                    <label class="remember">
+                        @Html.CheckBoxFor(m => m.RememberMe) Keep me signed in
+                    </label>
+
+                    <button type="submit" class="btn-signin">SIGN IN &rarr;</button>
+                    <p class="auth-note">&#9432; Authorized Users Only</p>
+                }
+            </div>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        // role toggle
+        var buttons = document.querySelectorAll('.role-btn');
+        var hidden = document.getElementById('LoginAs');
+        buttons.forEach(function (b) {
+            b.addEventListener('click', function () {
+                buttons.forEach(function (x) { x.classList.remove('active'); });
+                b.classList.add('active');
+                hidden.value = b.getAttribute('data-role');
+            });
+        });
+        // show / hide password
+        var pwd = document.getElementById('Password');
+        document.getElementById('togglePwd').addEventListener('click', function () {
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+        });
+    })();
+    </script>
+</body>
+</html>
