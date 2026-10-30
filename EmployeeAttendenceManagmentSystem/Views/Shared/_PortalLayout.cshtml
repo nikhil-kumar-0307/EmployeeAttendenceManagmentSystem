@@ -12,7 +12,8 @@
         ? new[]
         {
             new { Label = "Home", Controller = "AdminDashboard", Action = "Index", Match = new[] { "Index" } },
-            new { Label = "Assign subordinates", Controller = "AdminDashboard", Action = "Assignments", Match = new[] { "Assignments", "Manage", "Add", "Remove" } }
+            new { Label = "Assign subordinates", Controller = "AdminDashboard", Action = "Assignments", Match = new[] { "Assignments", "Manage", "Add", "Remove" } },
+            new { Label = "Reset passwords", Controller = "AdminDashboard", Action = "ResetPasswords", Match = new[] { "ResetPasswords", "ResetPassword" } }
                 }
         : new[]
         {
@@ -29,7 +30,8 @@
     <title>@ViewBag.Title | Employee Attendance Management System</title>
     <link href="~/Content/portal.css" rel="stylesheet" />
 
-    <style>        
+    <style>
+        /* ===== Layout chrome (header, navigation bar, footer) ===== */
         :root {
             --navy: #0a2a4a;
             --navy-2: #123f6e;
@@ -274,6 +276,18 @@
             font-weight: 700;
         }
 
+        .link-btn {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue);
+            padding: 8px 2px;
+            white-space: nowrap;
+        }
+
+            .link-btn:hover, .link-btn.active {
+                text-decoration: underline;
+            }
+
         .logout-form {
             margin: 0;
         }
@@ -399,7 +413,7 @@
             </div>
 
             <div class="logo-right">
-                <img src="~/Content/images/kahalgaon.png" alt="NTPC" class="logo-img" />
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="logo-img" />
             </div>
         </div>
         <div class="masthead-stripe" aria-hidden="true"></div>
@@ -423,6 +437,7 @@
                     {<span class="role-chip">Admin</span>}</strong>
                     <small>@(isAdmin ? "Admin ID" : "Emp. No") @Session["EmployeeCode"]</small>
                 </div>
+                <a class="link-btn @(controller == "Account" && action == "ChangePassword" ? "active" : "")" href="@Url.Action("ChangePassword", "Account")">Change password</a>
                 @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "logout-form" }))
                 {
                     @Html.AntiForgeryToken()

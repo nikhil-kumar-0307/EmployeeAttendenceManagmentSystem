@@ -958,3 +958,103 @@ a {
 		transition: none !important;
 	}
 }
+
+
+/* ===== Forms (change password) ===== */
+.form-card {
+	max-width: 520px;
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: 14px;
+	box-shadow: 0 4px 14px rgba(10, 42, 74, .05);
+	padding: 26px 28px 28px;
+}
+
+.form-alert {
+	max-width: 520px;
+}
+
+.f-group {
+	margin-bottom: 16px;
+}
+
+	.f-group label {
+		display: block;
+		font-size: 13px;
+		font-weight: 600;
+		margin-bottom: 6px;
+	}
+
+.f-input {
+	width: 100%;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	padding: 12px 14px;
+	font: 15px var(--font);
+	color: var(--ink);
+	background: #fafbfd;
+}
+
+	.f-input:focus {
+		outline: 2px solid rgba(29, 127, 214, .35);
+		border-color: var(--blue);
+		background: #fff;
+	}
+
+.f-error, .field-validation-error {
+	display: block;
+	margin-top: 5px;
+	font-size: 12.5px;
+	color: #b3261e;
+}
+
+.f-hint {
+	margin: 6px 0 0;
+	font-size: 12.5px;
+	color: var(--muted);
+}
+
+.f-check {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: var(--muted);
+	margin: 4px 0 18px;
+	cursor: pointer;
+}
+
+	.f-check input {
+		width: 16px;
+		height: 16px;
+		accent-color: var(--blue);
+	}
+
+.validation-summary-errors ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* ===== Admin banner buttons ===== */
+.banner-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.btn-ghost {
+	display: inline-flex;
+	align-items: center;
+	padding: 12px 20px;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, .45);
+	color: #fff;
+	font: 600 14px var(--font);
+	transition: background .12s;
+}
+
+	.btn-ghost:hover {
+		background: rgba(255, 255, 255, .12);
+	}

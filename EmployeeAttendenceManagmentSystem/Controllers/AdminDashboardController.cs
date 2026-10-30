@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
+using EmployeeAttendenceManagmentSystem.Helpers;
 using EmployeeAttendenceManagmentSystem.Models;
 using EmployeeAttendenceManagmentSystem.Models.Punches;
 using EmployeeAttendenceManagmentSystem.Models.Qms;
@@ -13,9 +14,9 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
 {
     public class AdminDashboardController : Controller
     {
-        private readonly AttendanceDbContext _db = new AttendanceDbContext();  
-        private readonly QmsDbContext _qms = new QmsDbContext();                
-        private readonly PunchDbContext _log = new PunchDbContext();           
+        private readonly AttendanceDbContext _db = new AttendanceDbContext();   // reporting lines
+        private readonly QmsDbContext _qms = new QmsDbContext();                // employees (read-only)
+        private readonly PunchDbContext _log = new PunchDbContext();            // fallback names (read-only)
 
         // Only a signed-in Admin may use anything in this controller
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -211,6 +212,63 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 TempData["Success"] = Lookup(new[] { employeeNo })[employeeNo].Name + " removed from the team.";
             }
             return RedirectToAction("Manage", new { managerNo, q });
+        }
+
+        // GET: /AdminDashboard/ResetPasswords?q=...
+        public ActionResult ResetPasswords(string q)
+        {
+            var vm = new ResetPasswordsVm { Query = (q ?? "").Trim() };
+
+            if (vm.Query.Length > 0)
+            {
+                vm.Results = SearchQms(vm.Query).Select(e => new ResetRow
+                {
+                    EmployeeNo = e.EmployeeNo,
+                    Name = TitleCase(e.EmployeeName),
+                    Department = e.Department,
+                    Designation = e.Designation,
+                    // "changed" = the QMS Password is no longer the date of birth
+                    HasCustomPassword = !DobHelper.Matches(e.Password, e.DateOfBirth)
+                }).ToList();
+            }
+            return View(vm);
+        }
+
+        // POST: /AdminDashboard/ResetPassword
+        // Writes the employee's date of birth (dd/MM/yyyy) back into the QMS Password column.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ResetPassword(string employeeNo, string q)
+        {
+            employeeNo = (employeeNo ?? "").Trim();
+            if (employeeNo.Length == 0)
+                return RedirectToAction("ResetPasswords");
+
+            var emp = _qms.EmployeeMasters.FirstOrDefault(e => e.EmployeeNo == employeeNo);
+            if (emp == null)
+            {
+                TempData["Error"] = "Employee " + employeeNo + " was not found in the employee master.";
+                return RedirectToAction("ResetPasswords", new { q });
+            }
+
+            var name = TitleCase(emp.EmployeeName);
+
+            if (DobHelper.Matches(emp.Password, emp.DateOfBirth))
+            {
+                TempData["Success"] = name + " already uses the default password (date of birth). Any sign-in lock was cleared.";
+            }
+            else
+            {
+                var dob = emp.DateOfBirth.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                _qms.SetPassword(emp.EmployeeNo, dob);
+                TempData["Success"] = name + "'s password was reset to the date of birth (" + dob + "). Any sign-in lock was cleared.";
+            }
+
+            // lift any sign-in / reset lock for this employee
+            System.Web.HttpRuntime.Cache.Remove("loginfail:Employee:" + employeeNo.ToLowerInvariant());
+            System.Web.HttpRuntime.Cache.Remove("loginfail:Reset:" + employeeNo.ToLowerInvariant());
+
+            return RedirectToAction("ResetPasswords", new { q });
         }
 
         // ---------------- helpers ----------------

@@ -452,6 +452,39 @@
                 accent-color: var(--blue);
             }
 
+        .row-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+            .row-between .remember {
+                margin-top: 0;
+            }
+
+        .forgot-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue);
+            white-space: nowrap;
+        }
+
+            .forgot-link:hover {
+                text-decoration: underline;
+            }
+
+        .alert-success {
+            background: #e7f6ec;
+            color: #17653a;
+            border: 1px solid #bfe5cd;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 13.5px;
+            margin-bottom: 14px;
+        }
+
         /* Button */
         .btn-signin {
             width: 100%;
@@ -673,6 +706,11 @@
                 <h3>Sign in</h3>
                 <p class="sub">Use your credentials to continue.</p>
 
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert-success" role="status">@TempData["Success"]</div>
+                }
+
                 @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", autocomplete = "off", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
@@ -711,10 +749,13 @@
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "field-error" })
                     <p class="field-hint" id="pwdHint"></p>
 
-                    <label class="remember">
-                        @Html.CheckBoxFor(m => m.RememberMe)
-                        <span>Keep me signed in on this computer</span>
-                    </label>
+                    <div class="row-between">
+                        <label class="remember">
+                            @Html.CheckBoxFor(m => m.RememberMe)
+                            <span>Keep me signed in on this computer</span>
+                        </label>
+                        <a href="@Url.Action("ForgotPassword", "Account")" class="forgot-link" id="forgotLink">Forgot password?</a>
+                    </div>
 
                     <button type="submit" class="btn-signin" id="btnSignin">
                         <span class="btn-label">Sign in</span>
@@ -741,6 +782,7 @@
                 document.getElementById('lblPwd').textContent = 'Password';
                 form.EmployeeCode.placeholder = emp ? 'Enter your employee number' : 'Enter your admin ID';
                 form.Password.placeholder = emp ? 'Your date of birth, e.g. 15/01/1985' : 'Enter your password';
+                document.getElementById('forgotLink').style.visibility = emp ? 'visible' : 'hidden';
                 document.getElementById('pwdHint').textContent = emp ? 'Your password is your date of birth, for example 15/01/1985.' : '';
             }
 

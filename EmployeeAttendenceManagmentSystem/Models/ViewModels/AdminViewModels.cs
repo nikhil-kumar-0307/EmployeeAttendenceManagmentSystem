@@ -47,4 +47,15 @@ namespace EmployeeAttendenceManagmentSystem.Models.ViewModels
         public string Query { get; set; }
         public List<SearchRow> Results { get; set; } = new List<SearchRow>();
     }
+
+    public class ResetRow : EmployeeBrief
+    {
+        public bool HasCustomPassword { get; set; }
+    }
+
+    public class ResetPasswordsVm
+    {
+        public string Query { get; set; }
+        public List<ResetRow> Results { get; set; } = new List<ResetRow>();
+    }
 }

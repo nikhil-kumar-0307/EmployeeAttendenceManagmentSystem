@@ -11,10 +11,13 @@
         <h1>Hello, @Model.DisplayName</h1>
         <p>Set up who reports to whom. Managers see their team's attendance based on these assignments.</p>
     </div>
-    <a class="btn-gold" href="@Url.Action("Assignments", "AdminDashboard")">
-        Assign subordinates
-        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-    </a>
+    <div class="banner-actions">
+        <a class="btn-ghost" href="@Url.Action("ResetPasswords", "AdminDashboard")">Reset passwords</a>
+        <a class="btn-gold" href="@Url.Action("Assignments", "AdminDashboard")">
+            Assign subordinates
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
+    </div>
 </section>
 
 <section class="stat-grid">

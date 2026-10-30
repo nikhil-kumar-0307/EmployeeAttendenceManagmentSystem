@@ -15,8 +15,12 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
         private const int MaxFailedAttempts = 5;
         private static readonly TimeSpan LockoutWindow = TimeSpan.FromMinutes(10);
 
-        private readonly AttendanceDbContext _db = new AttendanceDbContext();   // admins live here
+        private readonly AttendanceDbContext _db = new AttendanceDbContext();   // admins, password overrides
         private readonly QmsDbContext _qms = new QmsDbContext();                // employees live in QMS
+
+        // =====================================================================
+        //  SIGN IN / SIGN OUT
+        // =====================================================================
 
         // GET: /Account/Login
         [HttpGet]
@@ -91,6 +95,132 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
             return RedirectToAction("Login");
         }
 
+        // =====================================================================
+        //  CHANGE PASSWORD  (signed-in Admin or Employee)
+        // =====================================================================
+
+        // GET: /Account/ChangePassword
+        [HttpGet]
+        public ActionResult ChangePassword()
+        {
+            var redirect = RequireSignIn();
+            if (redirect != null) return redirect;
+
+            return View(new ChangePasswordDto());
+        }
+
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangePassword(ChangePasswordDto model)
+        {
+            var redirect = RequireSignIn();
+            if (redirect != null) return redirect;
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var code = (string)Session["EmployeeCode"];
+            var role = (string)Session["Role"];
+            var current = model.CurrentPassword.Trim();
+            var newPassword = model.NewPassword.Trim();
+
+            if (IsLockedOut("Change", code))
+            {
+                ModelState.AddModelError("", "Too many wrong attempts. Try again in a few minutes.");
+                return View(model);
+            }
+
+            if (string.Equals(current, newPassword, StringComparison.Ordinal))
+            {
+                ModelState.AddModelError("", "The new password must be different from the current one.");
+                return View(model);
+            }
+
+            bool currentOk;
+            if (role == UserRoles.Admin)
+            {
+                var admin = _db.Users.FirstOrDefault(u =>
+                    u.EmployeeCode == code && u.Role == UserRoles.Admin && u.IsActive);
+
+                currentOk = admin != null && admin.Password == model.CurrentPassword;
+                if (currentOk)
+                {
+                    admin.Password = newPassword;
+                    _db.SaveChanges();
+                }
+            }
+            else
+            {
+                var emp = _qms.EmployeeMasters.FirstOrDefault(e => e.EmployeeNo == code);
+                currentOk = emp != null && DobHelper.PasswordMatches(model.CurrentPassword, emp.Password);
+                if (currentOk)
+                    _qms.SetPassword(emp.EmployeeNo, newPassword);       // writes the QMS Password column
+            }
+
+            if (!currentOk)
+            {
+                RegisterFailure("Change", code);
+                ModelState.AddModelError("", "The current password is not correct.");
+                return View(model);
+            }
+
+            ClearFailures("Change", code);
+            TempData["Success"] = "Your password was changed. Use the new password the next time you sign in.";
+            return RedirectToAction("ChangePassword");
+        }
+
+        // =====================================================================
+        //  FORGOT PASSWORD  (employee, from the sign-in page)
+        // =====================================================================
+
+        // GET: /Account/ForgotPassword
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordDto());
+        }
+
+        // POST: /Account/ForgotPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult ForgotPassword(ForgotPasswordDto model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var code = model.EmployeeNo.Trim();
+
+            if (IsLockedOut("Reset", code))
+            {
+                ModelState.AddModelError("", "Too many failed attempts. Try again in a few minutes.");
+                return View(model);
+            }
+
+            // identity check: the date of birth must match the one in QMS
+            var emp = _qms.EmployeeMasters.FirstOrDefault(e => e.EmployeeNo == code);
+            if (emp == null || !DobHelper.Matches(model.DateOfBirth, emp.DateOfBirth))
+            {
+                RegisterFailure("Reset", code);
+                ModelState.AddModelError("", "We could not verify these details. Check the employee number and date of birth.");
+                return View(model);
+            }
+
+            _qms.SetPassword(emp.EmployeeNo, model.NewPassword.Trim());   // writes the QMS Password column
+
+            ClearFailures("Reset", code);
+            ClearFailures(UserRoles.Employee, code);   // also lift any sign-in lock
+
+            TempData["Success"] = "Your password was reset. Sign in with your new password.";
+            return RedirectToAction("Login");
+        }
+
+        // =====================================================================
+        //  helpers
+        // =====================================================================
+
         // ---------- Admin: Users table in the attendance database ----------
         private bool TryAdminLogin(string code, string password, out int id, out string name)
         {
@@ -110,8 +240,7 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
             return true;
         }
 
-        // ---------- Employee: EmployeeMaster table in the QMS database ----------
-        // Username = EmployeeNo, Password = the Password column of QMS (it holds the date of birth)
+        // ---------- Employee: QMS EmployeeMaster (EmployeeNo + Password column) ----------
         private bool TryEmployeeLogin(string employeeNo, string typedPassword,
                                       out int id, out string name, out string department)
         {
@@ -128,7 +257,17 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
             return true;
         }
 
-        // ---------- Simple lockout (a date of birth is easy to guess) ----------
+        private ActionResult RequireSignIn()
+        {
+            if (Session["EmployeeCode"] == null)
+            {
+                FormsAuthentication.SignOut();
+                return RedirectToAction("Login");
+            }
+            return null;
+        }
+
+        // ---------- Simple lockout ----------
         private static string FailKey(string role, string code)
         {
             return "loginfail:" + role + ":" + code.ToLowerInvariant();
@@ -155,7 +294,6 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
 
         private ActionResult RedirectToDashboard(string role)
         {
-            // Create these controllers/views next
             if (role == UserRoles.Admin)
                 return RedirectToAction("Index", "AdminDashboard");
 
