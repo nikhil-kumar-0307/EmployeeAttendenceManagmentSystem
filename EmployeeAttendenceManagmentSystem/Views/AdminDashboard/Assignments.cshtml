@@ -1,0 +1,116 @@
+﻿@model EmployeeAttendenceManagmentSystem.Models.ViewModels.AssignmentsVm
+@{
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+    ViewBag.Title = "Assign subordinates";
+    ViewBag.Crumb = "Assign subordinates";
+    Func<string, string> ini = n => string.IsNullOrWhiteSpace(n) ? "?" : n.Trim().Substring(0, 1).ToUpper();
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="status">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-error" role="alert">@TempData["Error"]</div>
+}
+
+<section class="page-head">
+    <div>
+        <a class="back-link" href="@Url.Action("Index", "AdminDashboard")">&larr; Back to home</a>
+        <h2>Assign subordinates</h2>
+        <p class="person">Find a manager, then choose the employees who report to them.</p>
+    </div>
+</section>
+
+<section class="panel block">
+    <div class="panel-head"><h3>Find a manager</h3></div>
+    <div class="panel-body">
+        <form method="get" class="search-row">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input type="text" name="q" value="@Model.Query" placeholder="Search by name, employee number or department" autofocus />
+            </div>
+            <button type="submit" class="btn-primary">Search</button>
+        </form>
+
+        @if (Model.Query.Length > 0)
+        {
+            if (Model.Results.Count == 0)
+            {
+                <div class="empty">No employee matches "@Model.Query".</div>
+            }
+            else
+            {
+                <div class="table-wrap result-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Employee</th><th>Designation</th><th>Department</th><th>Current team</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.Results)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="person-cell">
+                                            <span class="avatar">@ini(r.Name)</span>
+                                            <div><div class="p-name">@r.Name</div><div class="p-sub">Emp. No @r.EmployeeNo</div></div>
+                                        </div>
+                                    </td>
+                                    <td>@r.Designation</td>
+                                    <td>@r.Department</td>
+                                    <td>
+                                        @if (r.TeamSize > 0)
+                                        {
+                                            <span class="pill">@r.TeamSize @(r.TeamSize == 1 ? "employee" : "employees")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="td-right"><a class="btn-small btn-solid" href="@Url.Action("Manage", "AdminDashboard", new { managerNo = r.EmployeeNo })">Manage team</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+<section class="panel block">
+    <div class="panel-head"><h3>Managers with a team</h3><span class="count-chip">@Model.Managers.Count</span></div>
+    @if (Model.Managers.Count == 0)
+    {
+        <div class="empty">No one has a team yet. Search for a manager above to start.</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Manager</th><th>Designation</th><th>Department</th><th>Team size</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.Managers)
+                    {
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <span class="avatar">@ini(m.Name)</span>
+                                    <div><div class="p-name">@m.Name</div><div class="p-sub">Emp. No @m.EmployeeNo</div></div>
+                                </div>
+                            </td>
+                            <td>@m.Designation</td>
+                            <td>@m.Department</td>
+                            <td><span class="pill">@m.TeamSize @(m.TeamSize == 1 ? "employee" : "employees")</span></td>
+                            <td class="td-right"><a class="btn-small" href="@Url.Action("Manage", "AdminDashboard", new { managerNo = m.EmployeeNo })">Manage team</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

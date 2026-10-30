@@ -26,7 +26,7 @@ namespace EmployeeAttendenceManagmentSystem.Models
         [StringLength(100)]
         public string Department { get; set; }
 
-        // Stored as plain text (as requested)
+        // Stored as plain text
         [Required, StringLength(100)]
         public string Password { get; set; }
 

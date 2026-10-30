@@ -9,39 +9,645 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sign in | Employee Attendance Management System</title>
-    <link href="~/Content/login.css" rel="stylesheet" />
+
+    <style>
+        /* ===== Tokens ===== */
+        :root {
+            --navy: #0a2a4a;
+            --navy-2: #123f6e;
+            --gold: #f5b400;
+            --blue: #1d5fe0;
+            --blue-dark: #174fc0;
+            --ink: #14213d;
+            --muted: #64708a;
+            --line: #dbe2ec;
+            --bg: #eef2f7;
+            --error: #b3261e;
+            --error-bg: #fdecea;
+            --font: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            background: radial-gradient(900px 420px at 50% 0%, #dbe7f6 0%, rgba(219, 231, 246, 0) 70%), var(--bg);
+        }
+
+        svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ===== Top strip ===== */
+        .topbar {
+            background: var(--navy);
+            color: #cfe0f3;
+            font-size: 12.5px;
+        }
+
+        .topbar-inner {
+            padding: 7px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+            .topbar-left strong {
+                color: #fff;
+                font-size: 14px;
+                letter-spacing: .4px;
+            }
+
+                .topbar-left strong span {
+                    font-weight: 300;
+                    margin: 0 3px;
+                    opacity: .7;
+                }
+
+            .topbar-left em {
+                font-style: normal;
+                color: #a9bdd6;
+            }
+
+        .topbar-right {
+            color: #a9bdd6;
+            white-space: nowrap;
+        }
+
+        /* ===== Main header: logo | plant name | logo ===== */
+        .masthead {
+            background: #fff;
+            box-shadow: 0 2px 14px rgba(10, 42, 74, .10);
+            position: relative;
+            z-index: 2;
+        }
+
+        .masthead-inner {
+            padding: 14px 32px 16px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .logo-left {
+            justify-self: start;
+        }
+
+        .logo-right {
+            justify-self: end;
+        }
+
+        .logo-img {
+            display: block;
+            height: 58px;
+            width: auto;
+        }
+
+        .plant-title {
+            text-align: center;
+        }
+
+            .plant-title h1 {
+                margin: 0;
+                font-size: 26px;
+                font-weight: 800;
+                letter-spacing: .8px;
+                color: var(--navy);
+                line-height: 1.2;
+            }
+
+        .title-rule {
+            display: block;
+            width: 64px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--gold);
+            margin: 8px auto;
+        }
+
+        .plant-title p {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: .3px;
+        }
+
+        .masthead-stripe {
+            height: 4px;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--blue) 55%, var(--gold) 100%);
+        }
+
+        /* ===== Page + card ===== */
+        .login-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        .login-card {
+            display: flex;
+            width: 100%;
+            max-width: 920px;
+            min-height: 520px;
+            background: #fff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 26px 60px rgba(10, 42, 74, .18), 0 2px 6px rgba(10, 42, 74, .08);
+            animation: rise .45s ease both;
+        }
+
+        @@keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Left panel */
+        .login-side {
+            flex: 0 0 42%;
+            color: #fff;
+            padding: 40px 34px 34px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 28px;
+            background: radial-gradient(circle at 110% -10%, rgba(245, 180, 0, .22) 0, rgba(245, 180, 0, 0) 45%), radial-gradient(circle at -20% 110%, rgba(80, 140, 220, .28) 0, rgba(80, 140, 220, 0) 50%), linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        }
+
+        .side-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 999px;
+            margin-bottom: 18px;
+            background: rgba(245, 180, 0, .16);
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .4px;
+        }
+
+        .login-side h2 {
+            margin: 0 0 12px;
+            font-size: 24px;
+            line-height: 1.25;
+            font-weight: 700;
+        }
+
+        .side-lead {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #c4d2e4;
+            max-width: 32ch;
+        }
+
+        .features {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 16px;
+        }
+
+            .features li {
+                display: flex;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+        .f-ico {
+            flex: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .10);
+            color: var(--gold);
+        }
+
+            .f-ico svg {
+                width: 19px;
+                height: 19px;
+            }
+
+        .features strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .features li span.f-text {
+            display: block;
+            font-size: 12.5px;
+            color: #b6c6da;
+            margin-top: 2px;
+        }
+
+        /* Right panel */
+        .login-form-area {
+            flex: 1;
+            padding: 44px 48px 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .login-form-area h3 {
+                margin: 0;
+                font-size: 27px;
+                font-weight: 700;
+                letter-spacing: -.2px;
+            }
+
+        .sub {
+            margin: 6px 0 22px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Role toggle */
+        .role-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #edf1f7;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .role-btn {
+            border: 0;
+            background: transparent;
+            padding: 10px;
+            border-radius: 8px;
+            font: 600 13.5px var(--font);
+            color: var(--muted);
+            cursor: pointer;
+            transition: background .15s, color .15s;
+        }
+
+            .role-btn:hover {
+                color: var(--ink);
+            }
+
+            .role-btn.active {
+                background: #fff;
+                color: var(--blue);
+                box-shadow: 0 1px 4px rgba(10, 42, 74, .15);
+            }
+
+        /* Fields */
+        .field-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 16px 0 6px;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0 12px;
+            background: #fafbfd;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+        }
+
+            .input-box:focus-within {
+                border-color: var(--blue);
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(29, 95, 224, .15);
+            }
+
+            .input-box .ico {
+                width: 18px;
+                height: 18px;
+                color: #8895ad;
+                flex: none;
+            }
+
+            .input-box input {
+                flex: 1;
+                min-width: 0;
+                border: 0;
+                outline: 0;
+                background: transparent;
+                padding: 13px 0;
+                font: 15px var(--font);
+                color: var(--ink);
+            }
+
+                .input-box input::placeholder {
+                    color: #9aa6bb;
+                }
+
+                .input-box input.input-validation-error {
+                    color: var(--error);
+                }
+
+                .input-box input:-webkit-autofill {
+                    -webkit-box-shadow: 0 0 0 40px #fafbfd inset;
+                    -webkit-text-fill-color: var(--ink);
+                }
+
+        .eye {
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            padding: 4px;
+            color: #7a879f;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+        }
+
+            .eye:hover {
+                color: var(--ink);
+            }
+
+            .eye svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .eye .eye-off {
+                display: none;
+            }
+
+            .eye.showing .eye-on {
+                display: none;
+            }
+
+            .eye.showing .eye-off {
+                display: block;
+            }
+
+        .field-error, .field-validation-error {
+            display: block;
+            margin-top: 5px;
+            font-size: 12.5px;
+            color: var(--error);
+        }
+
+        .field-hint {
+            margin: 6px 0 0;
+            font-size: 12.5px;
+            color: var(--muted);
+        }
+
+            .field-hint:empty {
+                display: none;
+            }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+            .remember input {
+                width: 16px;
+                height: 16px;
+                accent-color: var(--blue);
+            }
+
+        /* Button */
+        .btn-signin {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(180deg, #2a6bec 0%, var(--blue) 100%);
+            color: #fff;
+            font: 700 15px var(--font);
+            letter-spacing: .2px;
+            box-shadow: 0 6px 16px rgba(29, 95, 224, .30);
+            transition: transform .12s, box-shadow .12s, background .12s;
+        }
+
+            .btn-signin:hover {
+                background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%);
+                box-shadow: 0 8px 20px rgba(29, 95, 224, .36);
+            }
+
+            .btn-signin:active {
+                transform: translateY(1px);
+            }
+
+            .btn-signin:disabled {
+                opacity: .75;
+                cursor: progress;
+            }
+
+            .btn-signin:focus-visible, .role-btn:focus-visible, .eye:focus-visible {
+                outline: 3px solid var(--gold);
+                outline-offset: 2px;
+            }
+
+        .auth-note {
+            margin: 20px 0 0;
+            padding-top: 16px;
+            border-top: 1px solid #edf1f6;
+            text-align: center;
+            font-size: 12px;
+            color: #8895ad;
+        }
+
+        /* Error banner */
+        .alert-error {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: var(--error-bg);
+            color: var(--error);
+            border: 1px solid #f5c6c2;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 13.5px;
+            margin-bottom: 4px;
+        }
+
+            .alert-error svg {
+                width: 18px;
+                height: 18px;
+                flex: none;
+                margin-top: 1px;
+            }
+
+            .alert-error ul, .validation-summary-errors ul {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: #7b88a1;
+        }
+
+        /* ===== Responsive ===== */
+        @@media (max-width: 1000px) {
+            .topbar-left em, .topbar-right {
+                display: none;
+            }
+
+            .topbar-inner {
+                justify-content: center;
+                padding: 7px 16px;
+            }
+
+            .masthead-inner {
+                grid-template-columns: auto 1fr;
+                padding: 12px 16px;
+                gap: 14px;
+            }
+
+            .logo-right {
+                display: none;
+            }
+
+            .plant-title {
+                text-align: left;
+            }
+
+                .plant-title h1 {
+                    font-size: 17px;
+                }
+
+            .title-rule {
+                margin-left: 0;
+            }
+
+            .logo-img {
+                height: 46px;
+            }
+        }
+
+        @@media (max-width: 760px) {
+            .login-wrap {
+                align-items: flex-start;
+                padding: 24px 14px;
+            }
+
+            .login-card {
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            .login-side {
+                flex: none;
+                padding: 26px 24px;
+                gap: 0;
+            }
+
+            .features {
+                display: none;
+            }
+
+            .login-side h2 {
+                font-size: 20px;
+            }
+
+            .login-form-area {
+                padding: 28px 22px 24px;
+            }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ===== Header ===== -->
-    <header class="site-header">
-        <div class="header-inner">
-            <div class="brand">
-                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="brand-logo" />
-                <div class="brand-text">
-                    <div class="brand-name">संगम <span>|</span> SANGAM</div>
-                    <div class="brand-tag">Powering Unification Of Processes</div>
-                </div>
+    <!-- ===== Top strip ===== -->
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="topbar-left">
+                <strong>संगम <span>|</span> SANGAM</strong>
+                <em>Powering Unification Of Processes</em>
+            </div>
+            <div class="topbar-right">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</div>
+        </div>
+    </div>
+
+    <!-- ===== Main header: logo | plant name | logo ===== -->
+    <header class="masthead">
+        <div class="masthead-inner">
+            <div class="logo-left">
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="logo-img" />
             </div>
 
             <div class="plant-title">
                 <h1>KAHALGAON SUPER THERMAL POWER STATION</h1>
+                <span class="title-rule" aria-hidden="true"></span>
                 <p>2340 MW (STAGE-1: 4X210, STAGE-2: 3X500)</p>
             </div>
 
-            <div class="header-right">
-                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="brand-logo" />
+            <div class="logo-right">
+                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="logo-img" />
             </div>
         </div>
+        <div class="masthead-stripe" aria-hidden="true"></div>
     </header>
 
     <!-- ===== Login ===== -->
     <main class="login-wrap">
         <section class="login-card">
 
-            <!-- Left: product panel -->
+            <!-- Left: info panel -->
             <aside class="login-side">
                 <div class="side-top">
+                    <span class="side-tag">Attendance Portal</span>
                     <h2>Employee Attendance<br />Management System</h2>
                     <p class="side-lead">One place to record, review and approve attendance for the station.</p>
                 </div>
@@ -49,25 +655,23 @@
                 <ul class="features">
                     <li>
                         <span class="f-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M9 16l2 2 4-4" /></svg></span>
-                        <div><strong>Daily attendance</strong><span>Check your records and shift details</span></div>
+                        <div><strong>Daily attendance</strong><span class="f-text">Check your records and shift details</span></div>
                     </li>
                     <li>
-                        <span class="f-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></span>
-                        <div><strong>Leave and overtime</strong><span>Apply, track and approve in one flow</span></div>
+                        <span class="f-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg></span>
+                        <div><strong>Team attendance</strong><span class="f-text">Managers can see who reports to them</span></div>
                     </li>
                     <li>
                         <span class="f-ico"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></span>
-                        <div><strong>Reports for admins</strong><span>Department and monthly summaries</span></div>
+                        <div><strong>Reports for admins</strong><span class="f-text">Department and monthly summaries</span></div>
                     </li>
                 </ul>
-
-                <small class="side-foot">&copy; @DateTime.Now.Year NTPC Kahalgaon. All rights reserved.</small>
             </aside>
 
             <!-- Right: form -->
             <div class="login-form-area">
                 <h3>Sign in</h3>
-                <p class="sub">Use your employee credentials to continue.</p>
+                <p class="sub">Use your credentials to continue.</p>
 
                 @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", autocomplete = "off", novalidate = "novalidate" }))
                 {
@@ -95,10 +699,10 @@
                     </div>
                     @Html.ValidationMessageFor(m => m.EmployeeCode, "", new { @class = "field-error" })
 
-                    <label for="Password" class="field-label" id="lblPwd">Date of birth</label>
+                    <label for="Password" class="field-label" id="lblPwd">Password</label>
                     <div class="input-box">
                         <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                        @Html.PasswordFor(m => m.Password, new { placeholder = "DD/MM/YYYY", autocomplete = "current-password" })
+                        @Html.PasswordFor(m => m.Password, new { placeholder = "Enter your password", autocomplete = "current-password" })
                         <button type="button" class="eye" id="togglePwd" aria-label="Show password">
                             <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                             <svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
@@ -122,6 +726,8 @@
         </section>
     </main>
 
+    <footer class="site-footer">&copy; @DateTime.Now.Year NTPC Kahalgaon. All rights reserved.</footer>
+
     <script>
         (function () {
             // Employee / Admin toggle
@@ -132,10 +738,10 @@
             function applyRole(role) {
                 var emp = role !== 'Admin';
                 document.getElementById('lblCode').textContent = emp ? 'Employee No' : 'Admin ID';
-                document.getElementById('lblPwd').textContent = emp ? 'Date of birth' : 'Password';
+                document.getElementById('lblPwd').textContent = 'Password';
                 form.EmployeeCode.placeholder = emp ? 'Enter your employee number' : 'Enter your admin ID';
-                form.Password.placeholder = emp ? 'DD/MM/YYYY' : 'Enter your password';
-                document.getElementById('pwdHint').textContent = emp ? 'Your date of birth is your password, for example 15/01/1985.' : '';
+                form.Password.placeholder = emp ? 'Your date of birth, e.g. 15/01/1985' : 'Enter your password';
+                document.getElementById('pwdHint').textContent = emp ? 'Your password is your date of birth, for example 15/01/1985.' : '';
             }
 
             buttons.forEach(function (b) {
@@ -159,12 +765,18 @@
                 eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
             });
 
+            // Reset the button when the page is shown again (back button / failed login)
+            window.addEventListener('pageshow', function () {
+                var b = document.getElementById('btnSignin');
+                b.disabled = false;
+                b.querySelector('.btn-label').textContent = 'Sign in';
+            });
+
             // Prevent double submit
             var btn = document.getElementById('btnSignin');
             form.addEventListener('submit', function () {
                 if (!form.EmployeeCode.value.trim() || !form.Password.value) return;
                 btn.disabled = true;
-                btn.classList.add('loading');
                 btn.querySelector('.btn-label').textContent = 'Signing in...';
             });
         })();

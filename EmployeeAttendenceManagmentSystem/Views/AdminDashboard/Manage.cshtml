@@ -1,0 +1,155 @@
+﻿@model EmployeeAttendenceManagmentSystem.Models.ViewModels.ManageTeamVm
+@{
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+    ViewBag.Title = "Manage team";
+    ViewBag.Crumb = "Assign subordinates";
+    var subtitle = string.Join(", ", new[] { Model.Manager.Designation, Model.Manager.Department }.Where(x => !string.IsNullOrEmpty(x)));
+    Func<string, string> ini = n => string.IsNullOrWhiteSpace(n) ? "?" : n.Trim().Substring(0, 1).ToUpper();
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="status">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-error" role="alert">@TempData["Error"]</div>
+}
+
+<a class="back-link back-spaced" href="@Url.Action("Assignments", "AdminDashboard")">&larr; Back to reporting lines</a>
+
+<section class="manager-card">
+    <span class="avatar avatar-lg">@ini(Model.Manager.Name)</span>
+    <div class="mc-info">
+        <span class="mc-tag">Manager</span>
+        <h2>@Model.Manager.Name</h2>
+        <p>
+            Emp. No @Model.Manager.EmployeeNo
+            @if (subtitle.Length > 0)
+            {
+                <span class="mc-dot">|</span>@subtitle
+            }
+        </p>
+    </div>
+    <div class="mc-count">
+        <span class="num">@Model.Team.Count</span>
+        <span class="lbl">@(Model.Team.Count == 1 ? "Subordinate" : "Subordinates")</span>
+    </div>
+</section>
+
+<section class="panel block">
+    <div class="panel-head"><h3>Current subordinates</h3><span class="count-chip">@Model.Team.Count</span></div>
+    @if (Model.Team.Count == 0)
+    {
+        <div class="empty">No subordinates yet. Search below to add some.</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Employee</th><th>Designation</th><th>Department</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Team)
+                    {
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <span class="avatar">@ini(t.Name)</span>
+                                    <div><div class="p-name">@t.Name</div><div class="p-sub">Emp. No @t.EmployeeNo</div></div>
+                                </div>
+                            </td>
+                            <td>@t.Designation</td>
+                            <td>@t.Department</td>
+                            <td class="td-right">
+                                @using (Html.BeginForm("Remove", "AdminDashboard", FormMethod.Post, new { @class = "inline-form" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="managerNo" value="@Model.Manager.EmployeeNo" />
+                                    <input type="hidden" name="employeeNo" value="@t.EmployeeNo" />
+                                    <input type="hidden" name="q" value="@Model.Query" />
+                                    <button type="submit" class="btn-danger" onclick="return confirm('Remove this employee from the team?');">Remove</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<section class="panel block">
+    <div class="panel-head"><h3>Add subordinates</h3></div>
+    <div class="panel-body">
+        <form method="get" class="search-row">
+            <input type="hidden" name="managerNo" value="@Model.Manager.EmployeeNo" />
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input type="text" name="q" value="@Model.Query" placeholder="Search by name, employee number or department" />
+            </div>
+            <button type="submit" class="btn-primary">Search</button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.Query))
+        {
+            if (Model.Results.Count == 0)
+            {
+                <div class="empty">No employee matches "@Model.Query".</div>
+            }
+            else
+            {
+                <div class="table-wrap result-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Employee</th><th>Designation</th><th>Department</th><th>Current manager</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.Results)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="person-cell">
+                                            <span class="avatar">@ini(r.Name)</span>
+                                            <div><div class="p-name">@r.Name</div><div class="p-sub">Emp. No @r.EmployeeNo</div></div>
+                                        </div>
+                                    </td>
+                                    <td>@r.Designation</td>
+                                    <td>@r.Department</td>
+                                    <td>
+                                        @if (r.IsInThisTeam)
+                                        {
+                                            <span class="badge b-present">In this team</span>
+                                        }
+                                        else if (r.CurrentManagerNo != null)
+                                        {
+                                            <span>@r.CurrentManagerName (@r.CurrentManagerNo)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">None</span>
+                                        }
+                                    </td>
+                                    <td class="td-right">
+                                        @if (!r.IsInThisTeam)
+                                        {
+                                            using (Html.BeginForm("Add", "AdminDashboard", FormMethod.Post, new { @class = "inline-form" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="managerNo" value="@Model.Manager.EmployeeNo" />
+                                                <input type="hidden" name="employeeNo" value="@r.EmployeeNo" />
+                                                <input type="hidden" name="q" value="@Model.Query" />
+                                                <button type="submit" class="btn-small btn-solid">@(r.CurrentManagerNo != null ? "Move here" : "Add")</button>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</section>

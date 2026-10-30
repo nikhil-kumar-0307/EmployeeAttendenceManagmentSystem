@@ -17,6 +17,7 @@ namespace EmployeeAttendenceManagmentSystem.Models.Qms
         public string Department { get; set; }
         public string Designation { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public string Password { get; set; }
         public DateTime DateOfRetirement { get; set; }
         public string Status { get; set; }
         public string PhotoPath { get; set; }

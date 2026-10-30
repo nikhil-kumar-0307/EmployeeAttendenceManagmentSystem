@@ -19,8 +19,6 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
         private readonly PunchDbContext _log = new PunchDbContext();            // attendance punches
 
         private string Me { get { return Session["EmployeeCode"] as string; } }
-
-        // Only a signed-in Employee may use anything in this controller
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (Me == null || (Session["Role"] as string) != UserRoles.Employee)
@@ -89,8 +87,8 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                     Name = emp != null ? TitleCase(emp.EmployeeName) : TitleCase(logName ?? no),
                     Designation = emp != null ? emp.Designation : "",
                     Status = StatusFor(day, s != null),
-                    InText = s != null ? s.First.ToString("HH:mm") : "-",
-                    OutText = s != null && s.Count > 1 ? s.Last.ToString("HH:mm") : "-"
+                    InText = s != null ? TimeText(s.First) : "-",
+                    OutText = s != null && s.Count > 1 ? TimeText(s.Last) : "-"
                 };
                 vm.Rows.Add(row);
 
@@ -206,8 +204,8 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 {
                     Date = date,
                     Status = StatusFor(date, s != null),
-                    InText = s != null ? s.First.ToString("HH:mm") : "-",
-                    OutText = s != null && s.Count > 1 ? s.Last.ToString("HH:mm") : "-",
+                    InText = s != null ? TimeText(s.First) : "-",
+                    OutText = s != null && s.Count > 1 ? TimeText(s.Last) : "-",
                     HoursText = s != null ? HoursText(s) : "-",
                     Punches = s != null ? s.Count : 0
                 };
@@ -225,6 +223,13 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
         }
 
         // ---------------- small helpers ----------------
+
+        // 12-hour clock with AM / PM, e.g. 08:47 AM, 05:12 PM
+        private static string TimeText(DateTime time)
+        {
+            return time.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+        }
+
         private static string HoursText(PunchSummary s)
         {
             if (s.Count < 2 || s.Last <= s.First) return "-";

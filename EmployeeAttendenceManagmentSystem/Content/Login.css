@@ -25,11 +25,11 @@ html, body {
 body {
     font-family: var(--font);
     color: var(--ink);
-    background: var(--bg);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     -webkit-font-smoothing: antialiased;
+    background: radial-gradient(900px 420px at 50% 0%, #dbe7f6 0%, rgba(219, 231, 246, 0) 70%), var(--bg);
 }
 
 svg {
@@ -40,58 +40,83 @@ svg {
     stroke-linejoin: round;
 }
 
-/* ===== Header ===== */
-.site-header {
+/* ===== Top strip ===== */
+.topbar {
     background: var(--navy);
-    color: #fff;
-    border-bottom: 3px solid var(--gold);
+    color: #cfe0f3;
+    font-size: 12.5px;
+}
+
+.topbar-inner {
+    padding: 7px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+    .topbar-left strong {
+        color: #fff;
+        font-size: 14px;
+        letter-spacing: .4px;
+    }
+
+        .topbar-left strong span {
+            font-weight: 300;
+            margin: 0 3px;
+            opacity: .7;
+        }
+
+    .topbar-left em {
+        font-style: normal;
+        color: #a9bdd6;
+    }
+
+.topbar-right {
+    color: #a9bdd6;
+    white-space: nowrap;
+}
+
+/* ===== Main header: logo | plant name | logo ===== */
+.masthead {
+    background: #fff;
+    box-shadow: 0 2px 14px rgba(10, 42, 74, .10);
     position: relative;
     z-index: 2;
 }
 
-.header-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 14px 28px;
+.masthead-inner {
+    padding: 14px 32px 16px;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 24px;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.logo-left {
+    justify-self: start;
 }
 
-.brand-logo {
-    width: 76px;
-    height: 50px;
+.logo-right {
+    justify-self: end;
+}
+
+.logo-badge {
+    display: block;
+    width: 84px;
+    height: 56px;
     object-fit: contain;
     background: #000;
     border: 2px solid #fff;
-    border-radius: 6px;
-    padding: 2px;
-}
-
-.brand-name {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: .4px;
-    line-height: 1.1;
-}
-
-    .brand-name span {
-        font-weight: 300;
-        margin: 0 4px;
-        opacity: .8;
-    }
-
-.brand-tag {
-    font-size: 12px;
-    color: #c4d2e4;
-    margin-top: 3px;
+    border-radius: 8px;
+    padding: 3px;
+    box-shadow: 0 3px 10px rgba(10, 42, 74, .28);
 }
 
 .plant-title {
@@ -100,85 +125,105 @@ svg {
 
     .plant-title h1 {
         margin: 0;
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 800;
-        letter-spacing: .6px;
-        color: var(--gold);
+        letter-spacing: .8px;
+        color: var(--navy);
+        line-height: 1.2;
     }
 
-    .plant-title p {
-        margin: 6px 0 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: #e6eef8;
-    }
+.title-rule {
+    display: block;
+    width: 64px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--gold);
+    margin: 8px auto 8px;
+}
 
-/* NTPC logo on the right side of the header */
-.header-right {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+.plant-title p {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .3px;
+}
+
+.masthead-stripe {
+    height: 4px;
+    background: linear-gradient(90deg, var(--navy) 0%, var(--blue) 55%, var(--gold) 100%);
 }
 
 /* ===== Page + card ===== */
 .login-wrap {
-    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 48px 16px 72px;
+    padding: 40px 16px;
 }
 
-    .login-wrap::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        height: 200px;
-        background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
-    }
-
 .login-card {
-    position: relative;
-    z-index: 1;
     display: flex;
     width: 100%;
-    max-width: 900px;
+    max-width: 920px;
     min-height: 520px;
-    margin: 0;
     background: #fff;
-    border-radius: 16px;
+    border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 24px 60px rgba(10, 42, 74, .22), 0 2px 6px rgba(10, 42, 74, .08);
+    box-shadow: 0 26px 60px rgba(10, 42, 74, .18), 0 2px 6px rgba(10, 42, 74, .08);
+    animation: rise .45s ease both;
+}
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 /* Left panel */
 .login-side {
     flex: 0 0 42%;
     color: #fff;
-    padding: 36px 34px 26px;
+    padding: 40px 34px 34px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 28px;
-    background: radial-gradient(circle at 110% -10%, rgba(245, 180, 0, .20) 0, rgba(245, 180, 0, 0) 45%), radial-gradient(circle at -20% 110%, rgba(80, 140, 220, .25) 0, rgba(80, 140, 220, 0) 50%), linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+    background: radial-gradient(circle at 110% -10%, rgba(245, 180, 0, .22) 0, rgba(245, 180, 0, 0) 45%), radial-gradient(circle at -20% 110%, rgba(80, 140, 220, .28) 0, rgba(80, 140, 220, 0) 50%), linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
 }
 
-    .login-side h2 {
-        margin: 0 0 10px;
-        font-size: 22px;
-        line-height: 1.25;
-        font-weight: 700;
-    }
+.side-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+    background: rgba(245, 180, 0, .16);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.login-side h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 700;
+}
 
 .side-lead {
     margin: 0;
-    font-size: 13.5px;
-    line-height: 1.55;
+    font-size: 14px;
+    line-height: 1.6;
     color: #c4d2e4;
-    max-width: 30ch;
+    max-width: 32ch;
 }
 
 .features {
@@ -197,9 +242,9 @@ svg {
 
 .f-ico {
     flex: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: grid;
     place-items: center;
     background: rgba(255, 255, 255, .10);
@@ -207,26 +252,21 @@ svg {
 }
 
     .f-ico svg {
-        width: 18px;
-        height: 18px;
+        width: 19px;
+        height: 19px;
     }
 
 .features strong {
     display: block;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .features li span:not(.f-ico) {
     display: block;
-    font-size: 12px;
+    font-size: 12.5px;
     color: #b6c6da;
     margin-top: 2px;
-}
-
-.side-foot {
-    font-size: 11px;
-    color: #8fa5c0;
 }
 
 /* Right panel */
@@ -240,7 +280,7 @@ svg {
 
     .login-form-area h3 {
         margin: 0;
-        font-size: 26px;
+        font-size: 27px;
         font-weight: 700;
         letter-spacing: -.2px;
     }
@@ -333,6 +373,11 @@ svg {
         .input-box input.input-validation-error {
             color: var(--error);
         }
+        /* keep browser autofill inside the rounded box */
+        .input-box input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 40px #fafbfd inset;
+            -webkit-text-fill-color: var(--ink);
+        }
 
 .eye {
     border: 0;
@@ -372,6 +417,16 @@ svg {
     font-size: 12.5px;
     color: var(--error);
 }
+
+.field-hint {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+    .field-hint:empty {
+        display: none;
+    }
 
 .remember {
     display: flex;
@@ -454,54 +509,63 @@ svg {
         margin-top: 1px;
     }
 
-    .alert-error ul {
+    .alert-error ul, .validation-summary-errors ul {
         margin: 0;
         padding: 0;
         list-style: none;
     }
 
-.validation-summary-errors ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+/* ===== Footer ===== */
+.site-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #7b88a1;
 }
-
-/* Helper text under a field */
-.field-hint {
-    margin: 6px 0 0;
-    font-size: 12.5px;
-    color: var(--muted);
-}
-
-    .field-hint:empty {
-        display: none;
-    }
 
 /* ===== Responsive ===== */
 @media (max-width: 1000px) {
-    .header-inner {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 10px;
-    }
-
-    .brand {
-        justify-content: center;
-    }
-
-    .header-right {
+    .topbar-left em, .topbar-right {
         display: none;
     }
 
-    .plant-title h1 {
-        font-size: 18px;
+    .topbar-inner {
+        justify-content: center;
+        padding: 7px 16px;
+    }
+
+    .masthead-inner {
+        grid-template-columns: auto 1fr;
+        padding: 12px 16px;
+        gap: 14px;
+    }
+
+    .logo-right {
+        display: none;
+    }
+
+    .plant-title {
+        text-align: left;
+    }
+
+        .plant-title h1 {
+            font-size: 17px;
+        }
+
+    .title-rule {
+        margin-left: 0;
+    }
+
+    .logo-badge {
+        width: 66px;
+        height: 44px;
     }
 }
 
 @media (max-width: 760px) {
     .login-wrap {
         align-items: flex-start;
-        padding-top: 28px;
+        padding: 24px 14px;
     }
 
     .login-card {
@@ -515,12 +579,12 @@ svg {
         gap: 0;
     }
 
-    .features, .side-foot {
+    .features {
         display: none;
     }
 
     .login-side h2 {
-        font-size: 19px;
+        font-size: 20px;
     }
 
     .login-form-area {
@@ -531,5 +595,6 @@ svg {
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
+        animation: none !important;
     }
 }

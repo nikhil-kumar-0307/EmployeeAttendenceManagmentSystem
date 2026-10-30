@@ -60,7 +60,7 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 RegisterFailure(role, code);
                 ModelState.AddModelError("", asAdmin
                     ? "Invalid admin ID or password."
-                    : "Invalid employee number or date of birth.");
+                    : "Invalid employee number or password.");
                 model.Password = null;
                 return View(model);
             }
@@ -111,15 +111,15 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
         }
 
         // ---------- Employee: EmployeeMaster table in the QMS database ----------
-        // Username = EmployeeNo, Password = Date of Birth
-        private bool TryEmployeeLogin(string employeeNo, string typedDob,
+        // Username = EmployeeNo, Password = the Password column of QMS (it holds the date of birth)
+        private bool TryEmployeeLogin(string employeeNo, string typedPassword,
                                       out int id, out string name, out string department)
         {
             id = 0; name = null; department = null;
 
             var emp = _qms.EmployeeMasters.FirstOrDefault(e => e.EmployeeNo == employeeNo);
 
-            if (emp == null || !DobHelper.Matches(typedDob, emp.DateOfBirth))
+            if (emp == null || !DobHelper.PasswordMatches(typedPassword, emp.Password))
                 return false;
 
             id = emp.Id;

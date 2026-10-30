@@ -1,0 +1,84 @@
+﻿@model EmployeeAttendenceManagmentSystem.Models.ViewModels.AdminHomeVm
+@{
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+    ViewBag.Title = "Admin home";
+    Func<string, string> ini = n => string.IsNullOrWhiteSpace(n) ? "?" : n.Trim().Substring(0, 1).ToUpper();
+}
+
+<section class="banner">
+    <div>
+        <span class="banner-tag">Admin console</span>
+        <h1>Hello, @Model.DisplayName</h1>
+        <p>Set up who reports to whom. Managers see their team's attendance based on these assignments.</p>
+    </div>
+    <a class="btn-gold" href="@Url.Action("Assignments", "AdminDashboard")">
+        Assign subordinates
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+    </a>
+</section>
+
+<section class="stat-grid">
+    <div class="stat s-blue">
+        <span class="stat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg></span>
+        <div><span class="num">@Model.EmployeeCount</span><span class="lbl">Employees in the master</span></div>
+    </div>
+    <div class="stat s-green">
+        <span class="stat-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg></span>
+        <div><span class="num">@Model.ManagerCount</span><span class="lbl">Managers with a team</span></div>
+    </div>
+    <div class="stat s-gold">
+        <span class="stat-ico"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg></span>
+        <div><span class="num">@Model.AssignedCount</span><span class="lbl">Employees assigned</span></div>
+    </div>
+</section>
+
+<section class="dash-grid">
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Managers and their teams</h3>
+            <a class="panel-link" href="@Url.Action("Assignments", "AdminDashboard")">View all</a>
+        </div>
+
+        @if (Model.TopManagers.Count == 0)
+        {
+            <div class="empty">No one has a team yet. Use "Assign subordinates" to start.</div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Manager</th><th>Department</th><th>Team</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model.TopManagers)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="person-cell">
+                                        <span class="avatar">@ini(m.Name)</span>
+                                        <div><div class="p-name">@m.Name</div><div class="p-sub">Emp. No @m.EmployeeNo</div></div>
+                                    </div>
+                                </td>
+                                <td>@(string.IsNullOrEmpty(m.Department) ? "-" : m.Department)</td>
+                                <td><span class="pill">@m.TeamSize @(m.TeamSize == 1 ? "employee" : "employees")</span></td>
+                                <td class="td-right"><a class="btn-small" href="@Url.Action("Manage", "AdminDashboard", new { managerNo = m.EmployeeNo })">Manage team</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <aside class="panel">
+        <div class="panel-head"><h3>How it works</h3></div>
+        <ol class="steps">
+            <li><span class="step-no">1</span><div><strong>Pick a manager</strong><span>Search by name, employee number or department.</span></div></li>
+            <li><span class="step-no">2</span><div><strong>Add their team</strong><span>Each employee has one manager. Adding someone already assigned moves them.</span></div></li>
+            <li><span class="step-no">3</span><div><strong>Managers see attendance</strong><span>The manager's "Subordinate attendance" page lists these people.</span></div></li>
+        </ol>
+    </aside>
+
+</section>
