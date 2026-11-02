@@ -197,11 +197,19 @@
             gap: 16px;
         }
 
+        /* navigation bar tabs */
         .tabs {
             display: flex;
             gap: 4px;
             overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
 
         .tab {
             position: relative;
@@ -225,7 +233,7 @@
                     position: absolute;
                     left: 12px;
                     right: 12px;
-                    bottom: -1px;
+                    bottom: 0;
                     height: 3px;
                     border-radius: 3px 3px 0 0;
                     background: var(--blue);
@@ -388,16 +396,7 @@
 </head>
 <body>
 
-    <!-- ===== Top strip ===== -->
-    <div class="topbar">
-        <div class="topbar-inner">
-            <div class="topbar-left">
-                <strong>संगम <span>|</span> SANGAM</strong>
-                <em>Powering Unification Of Processes</em>
-            </div>
-            <div class="topbar-right">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</div>
-        </div>
-    </div>
+    
 
     <!-- ===== Main header: logo | plant name | logo ===== -->
     <header class="masthead">
@@ -413,7 +412,7 @@
             </div>
 
             <div class="logo-right">
-                <img src="~/Content/images/ntpc-logo.png" alt="NTPC" class="logo-img" />
+                <img src="~/Content/images/kahalgaon.png" alt="NTPC" class="logo-img" />
             </div>
         </div>
         <div class="masthead-stripe" aria-hidden="true"></div>
