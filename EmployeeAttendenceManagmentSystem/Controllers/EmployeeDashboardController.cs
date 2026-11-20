@@ -42,7 +42,8 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
             return View(vm);
         }
 
-        // GET: /EmployeeDashboard/MyAttendance?month=2026-10
+        // GET: /EmployeeDashboard/MyAttendance?month=2026-11
+        // Month "2026-11" means the cycle 16 Oct 2026 to 15 Nov 2026
         public ActionResult MyAttendance(string month)
         {
             ViewBag.Crumb = "My attendance";
@@ -104,7 +105,7 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
             return View(vm);
         }
 
-        // GET: /EmployeeDashboard/SubordinateMonthly?employeeNo=9001&month=2026-10
+        // GET: /EmployeeDashboard/SubordinateMonthly?employeeNo=9001&month=2026-11
         public ActionResult SubordinateMonthly(string employeeNo, string month)
         {
             var me = Me;
@@ -166,12 +167,21 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 .ToDictionary(x => x.Code, x => x.Name, StringComparer.OrdinalIgnoreCase);
         }
 
+        // Cycle for month M starts on the 16th of month M-1
+        private static DateTime CycleStart(DateTime month)
+        {
+            return new DateTime(month.Year, month.Month, 1).AddMonths(-1).AddDays(15);
+        }
+
         private MonthlyAttendanceVm BuildMonth(string employeeNo, DateTime month, bool isSelf)
         {
             var emp = _qms.EmployeeMasters.FirstOrDefault(e => e.EmployeeNo == employeeNo);
-            var end = month.AddMonths(1);
 
-            var perDay = Summaries(new List<string> { employeeNo }, month, end)
+            // Cycle for "November" = 16 Oct (inclusive) to 15 Nov (inclusive)
+            var start = CycleStart(month);          // 16th of previous month
+            var end = month.AddDays(15);            // 16th of selected month (exclusive)
+
+            var perDay = Summaries(new List<string> { employeeNo }, start, end)
                 .Where(s => s.Day.HasValue)
                 .ToDictionary(s => s.Day.Value.Date);
 
@@ -193,10 +203,10 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 IsSelf = isSelf
             };
 
-            int days = DateTime.DaysInMonth(month.Year, month.Month);
+            int days = (end - start).Days;
             for (int i = 0; i < days; i++)
             {
-                var date = month.AddDays(i);
+                var date = start.AddDays(i);
                 PunchSummary s;
                 perDay.TryGetValue(date, out s);
 
@@ -244,8 +254,11 @@ namespace EmployeeAttendenceManagmentSystem.Controllers
                 DateTime.TryParseExact(month, "yyyy-MM", CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
                 return new DateTime(d.Year, d.Month, 1);
 
+            // No month chosen: show the cycle that contains today.
+            // From the 16th onwards we are already in next month's cycle.
             var now = DateTime.Today;
-            return new DateTime(now.Year, now.Month, 1);
+            var first = new DateTime(now.Year, now.Month, 1);
+            return now.Day >= 16 ? first.AddMonths(1) : first;
         }
 
         private static DateTime ParseDate(string date)

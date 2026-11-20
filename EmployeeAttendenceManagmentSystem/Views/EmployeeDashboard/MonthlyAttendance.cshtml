@@ -3,6 +3,10 @@
     Layout = "~/Views/Shared/_PortalLayout.cshtml";
     ViewBag.Title = Model.IsSelf ? "My attendance" : "Subordinate attendance";
     var subtitle = string.Join(", ", new[] { Model.Designation, Model.Department }.Where(x => !string.IsNullOrEmpty(x)));
+
+    // Cycle for the selected month: 16th of previous month to 15th of selected month
+    var periodStart = Model.Month.AddMonths(-1).AddDays(15);
+    var periodEnd = Model.Month.AddDays(14);
 }
 
 <section class="page-head">
@@ -19,6 +23,7 @@
                 <br />@subtitle
             }
         </p>
+        <p class="person">Attendance cycle for @Model.Month.ToString("MMMM yyyy"): 16th of the previous month to 15th.</p>
     </div>
 
     <form method="get" class="toolbar">
@@ -40,7 +45,9 @@
 </section>
 
 <section class="panel">
-    <h3 class="panel-title">@Model.Month.ToString("MMMM yyyy")</h3>
+    <h3 class="panel-title">
+        @periodStart.ToString("dd MMM yyyy") &ndash; @periodEnd.ToString("dd MMM yyyy")
+    </h3>
     <div class="table-wrap">
         <table class="data-table">
             <thead>
